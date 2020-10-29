@@ -5,6 +5,7 @@
                 <th>Id Wh</th>
                 <th>Store Id</th>
                 <th>Event</th>
+                <th>Resource_json</th>
                 <th>Created_at</th>
 
             </tr>
@@ -15,6 +16,7 @@
                 <td>{{ $webHook->id_wh }}</td>
                 <td>{{ $webHook->store_id }}</td>
                 <td>{{ $webHook->event }}</td>
+                <td><pre>{{ $webHook->resource_json }}</pre></td>
                 <td>{{ $webHook->created_at }}</td>
             </tr>
             @endforeach

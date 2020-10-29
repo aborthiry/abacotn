@@ -85,7 +85,6 @@ Route::post('/tienda/{store_id}/{resource}', function ($store_id,$resource) {
 
 
 Route::post('/tienda/callback/update/product', function () {
-
     $data = file_get_contents('php://input');
     $dataArray = json_decode($data, true);    
     $tienda = Tienda::where('store_id', '=', $dataArray['store_id'])->firstOrFail();
@@ -97,17 +96,46 @@ Route::post('/tienda/callback/update/product', function () {
         ], 401);
     }
 
+    $api = new TiendaNube\API($tienda->store_id, $tienda->token, 'prueba (arielborthiryt@gmail.com)');
+    
+    $resource_id = $dataArray['id'];    
+    $event =  $dataArray['event']; 
+    $resource = explode("/", $event);
+    $event = $resource[0];    
+    
+    $response = $api->get($event.'s/'.$resource_id);
+   
     $webhook = new WebHook;
     $webhook->id_wh = $dataArray['id'];
     $webhook->store_id = $dataArray['store_id'];
     $webhook->event = $dataArray['event'];
+    $webhook->resource_json = json_encode((array)$response->body, JSON_PRETTY_PRINT);
     $webhook->save();
 
     return response()->json([
         'message' => 'Successfully created event webhook'
-    ], 201);
-    
-    
+    ], 200);        
 });
+
+Route::get('/tienda/{store_id}/{resource}', function ($store_id, $resource) {
+
+    $tienda = Tienda::where('store_id', '=', $store_id)->firstOrFail();
+    
+    $api = new TiendaNube\API($store_id, $tienda->token, 'prueba (arielborthiryt@gmail.com)');
+    $response = $api->get("$resource");
+
+    dd($response);
+});
+
+Route::get('/tienda/{store_id}/{resource}/{resource_id}', function ($store_id,$resource, $resource_id) {
+
+    $tienda = Tienda::where('store_id', '=', $store_id)->firstOrFail();
+    
+    $api = new TiendaNube\API($store_id, $tienda->token, 'prueba (arielborthiryt@gmail.com)');
+    $response = $api->get("$resource/$resource_id");
+
+    dd($response);
+});
+
 
 
